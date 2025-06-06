@@ -12,7 +12,7 @@ import java.util.Iterator;
 @Service
 
 public class moviesService {
-    private final moviesRepo movieRepository;
+    private final moviesRepo movieRepository;   
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
 
