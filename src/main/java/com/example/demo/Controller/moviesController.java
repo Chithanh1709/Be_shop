@@ -7,6 +7,7 @@ import com.example.demo.Service.moviesService;
 import com.example.demo.Model.movies;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import java.util.List;
 
 
 @RestController
@@ -14,6 +15,9 @@ public class moviesController {
 
     @Autowired
     private moviesService moviesService;
+
+    @Autowired
+    private moviesRepo moviesRepo;
 
     public moviesController(moviesService moviesService) {
         this.moviesService = moviesService;
@@ -30,6 +34,13 @@ public String syncMovies(@RequestParam(defaultValue = "1") int page) {
     }
 }
 
-    
-    
+
+@GetMapping("/movies/sorted")
+public List<movies> getAllMoviesSorted() {
+    return moviesRepo.findAllByOrderByReleaseDateDesc();
 }
+}
+
+    
+    
+
