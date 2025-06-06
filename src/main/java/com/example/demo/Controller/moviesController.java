@@ -20,15 +20,16 @@ public class moviesController {
     }
 
     @GetMapping("/movies")
-    public String syncMovies() {
-        try {
-            moviesService.fetchAndSaveMovies();
-            return "Đã đồng bộ phim thành công!";
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "Đã xảy ra lỗi khi đồng bộ phim: " + e.getMessage();
-        }
+public String syncMovies(@RequestParam(defaultValue = "1") int page) {
+    try {
+        moviesService.fetchAndSaveMovies(page);
+        return "Đã đồng bộ phim thành công (trang " + page + ")!";
+    } catch (Exception e) {
+        e.printStackTrace();
+        return "Đã xảy ra lỗi khi đồng bộ phim: " + e.getMessage();
     }
+}
+
     
     
 }

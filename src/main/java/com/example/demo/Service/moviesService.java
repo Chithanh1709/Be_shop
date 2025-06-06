@@ -1,4 +1,5 @@
 package com.example.demo.Service;
+
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -8,15 +9,16 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.time.LocalDate;
-import java.util.Iterator;
-@Service
 
+@Service
 public class moviesService {
-    private final moviesRepo movieRepository;   
+    private final moviesRepo movieRepository;
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
 
-    private final String API_URL = "https://api.themoviedb.org/3/movie/now_playing?api_key=e837128ee3cc897806752f6bab1bbc7d&language=vi-VN&page=1";
+    private final String BASE_API_URL = "https://api.themoviedb.org/3/movie/now_playing";
+    private final String API_KEY = "e837128ee3cc897806752f6bab1bbc7d";
+    private final String LANGUAGE = "vi-VN";
 
     public moviesService(moviesRepo movieRepository) {
         this.movieRepository = movieRepository;
@@ -24,8 +26,13 @@ public class moviesService {
         this.objectMapper = new ObjectMapper();
     }
 
-    public void fetchAndSaveMovies() throws Exception {
-        String json = restTemplate.getForObject(API_URL, String.class);
+    private String buildUrl(int page) {
+        return BASE_API_URL + "?api_key=" + API_KEY + "&language=" + LANGUAGE + "&page=" + page;
+    }
+
+    public void fetchAndSaveMovies(int page) throws Exception {
+        String url = buildUrl(page);
+        String json = restTemplate.getForObject(url, String.class);
         JsonNode root = objectMapper.readTree(json);
         JsonNode results = root.path("results");
 
@@ -49,5 +56,4 @@ public class moviesService {
             movieRepository.save(movie);
         }
     }
-    
 }
