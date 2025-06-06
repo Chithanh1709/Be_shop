@@ -2,7 +2,7 @@ package com.example.demo.Controller;
 
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.demo.Model.users;
+import com.example.demo.Model.Users;
 import com.example.demo.Repository.userRepo;
 
 import java.util.HashMap;
@@ -21,8 +21,8 @@ public class AdminController {
     private userRepo userRepo;
 
     @PostMapping("/login-admin")
-    public ResponseEntity<?> loginAdmin(@RequestBody users userEntity) {
-        Optional<users> userOptional = userRepo.findByEmail(userEntity.getEmail());
+    public ResponseEntity<?> loginAdmin(@RequestBody Users userEntity) {
+        Optional<Users> userOptional = userRepo.findByEmail(userEntity.getEmail());
         Map<String, Object> response = new HashMap<>();
 
         if (userOptional.isEmpty()) {
@@ -31,7 +31,7 @@ public class AdminController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
 
-        users user = userOptional.get();
+        Users user = userOptional.get();
 
         // Kiểm tra mật khẩu
         if (!user.getPassword().equals(userEntity.getPassword())) {
@@ -41,7 +41,7 @@ public class AdminController {
         }
 
         // Kiểm tra vai trò
-        if (user.getRole() != users.Role.admin) {
+        if (user.getRole() != Users.Role.admin) {
             response.put("status", "error");
             response.put("message", "Chỉ tài khoản admin mới được đăng nhập");
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
@@ -51,5 +51,7 @@ public class AdminController {
         response.put("message", "Đăng nhập thành công");
         return ResponseEntity.ok(response);
     }
+
+    
 
 }

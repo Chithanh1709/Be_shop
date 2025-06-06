@@ -3,7 +3,7 @@ package com.example.demo.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.demo.Model.users;
+import com.example.demo.Model.Users;
 import com.example.demo.Repository.userRepo;
 
 import java.util.HashMap;
@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import com.example.demo.Model.Users.Role;
 
 @RestController
 public class userController {
@@ -22,9 +23,13 @@ public class userController {
     private userRepo userRepo;
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody users entity) {
-        Optional<users> userOptional = userRepo.findByEmail(entity.getEmail());
-        Map<String, Object> response = new HashMap<>();
+    public ResponseEntity<?> login(@RequestBody Users entity) {
+       Map<String, Object> response = new HashMap<>();
+
+        String email = entity.getEmail().trim().toLowerCase();
+        String password = entity.getPassword();
+
+        Optional<Users> userOptional = userRepo.findByEmail(email);
 
         if (userOptional.isEmpty()) {
             response.put("status", "error");
@@ -32,17 +37,17 @@ public class userController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
 
-        users user = userOptional.get();
+        Users user = userOptional.get();
 
-        // Kiểm tra mật khẩu
-        if (!user.getPassword().equals(entity.getPassword())) {
+        // Kiểm tra mật khẩu (nếu có mã hóa thì so sánh bằng BCrypt)
+        if (!user.getPassword().equals(password)) {
             response.put("status", "error");
             response.put("message", "Mật khẩu không đúng");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }
 
         // Kiểm tra vai trò
-        if (user.getRole() != users.Role.customer) {
+        if (user.getRole() != Users.Role.customer) {
             response.put("status", "error");
             response.put("message", "Chỉ tài khoản khách hàng mới được đăng nhập");
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
@@ -50,12 +55,13 @@ public class userController {
 
         response.put("status", "success");
         response.put("message", "Đăng nhập thành công");
+        response.put("user", user); // có thể trả về thông tin cần thiết
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("/regist")
-    public ResponseEntity<?> register(@RequestBody users entity) {
-        Optional<users> existingUser = userRepo.findByEmail(entity.getEmail());
+    public ResponseEntity<?> register(@RequestBody Users entity) {
+        Optional<Users> existingUser = userRepo.findByEmail(entity.getEmail());
         Map<String, Object> response = new HashMap<>();
 
         if (existingUser.isPresent()) {
@@ -66,12 +72,10 @@ public class userController {
 
         // Gán role mặc định là "customer" nếu chưa có
         if (entity.getRole() == null) {
-            entity.setRole(users.Role.customer);
+            entity.setRole(Users.Role.customer);
         }
 
-        if (entity.getCreatedAt() == null) {
-            entity.setCreatedAt(java.time.LocalDateTime.now());
-        }
+      
 
         userRepo.save(entity);
         response.put("status", "success");
@@ -80,8 +84,8 @@ public class userController {
     }
 
     @PostMapping("/recover")
-    public ResponseEntity<?> recover(@RequestBody users entity) {
-        Optional<users> userOptional = userRepo.findByEmail(entity.getEmail());
+    public ResponseEntity<?> recover(@RequestBody Users entity) {
+        Optional<Users> userOptional = userRepo.findByEmail(entity.getEmail());
         Map<String, Object> response = new HashMap<>();
 
         if (userOptional.isEmpty()) {
@@ -90,7 +94,7 @@ public class userController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
 
-        users user = userOptional.get();
+        Users user = userOptional.get();
         user.setPassword(entity.getPassword());
         userRepo.save(user);
 

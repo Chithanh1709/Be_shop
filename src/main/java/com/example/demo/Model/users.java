@@ -1,18 +1,17 @@
 package com.example.demo.Model;
 
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "users")
-public class users {
+@Table(name = "Users")
+public class Users {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private int userId;
 
     @Column(nullable = false, length = 100)
-    private String name;
+    private String fullName;
 
     @Column(nullable = false, unique = true, length = 100)
     private String email;
@@ -20,44 +19,48 @@ public class users {
     @Column(nullable = false, length = 255)
     private String password;
 
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Role role = Role.customer;
-
-    @Column(name = "created_at", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    private LocalDateTime createdAt;
+    @Enumerated(EnumType.STRING)  // Lưu enum dưới dạng String trong DB
+    private Role role = Role.customer;  // Khai báo kiểu Role, mặc định customer
 
     public enum Role {
         customer,
         admin
     }
 
-    public users() {
+    public Users() {
     }
 
-    public users(int id, String name, String email, String password, Role role) {
-        this.id = id;
-        this.name = name;
+    public Users(String fullName, String email, String password, Role role) {
+        this.fullName = fullName;
+        this.email = email;
+        this.password = password;
+        this.role = role;
+    }
+
+    public Users(int userId, String fullName, String email, String password, Role role) {
+        this.userId = userId;
+        this.fullName = fullName;
         this.email = email;
         this.password = password;
         this.role = role;
     }
 
     // Getters & Setters
-    public int getId() {
-        return id;
+    public int getUserId() {
+        return userId;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 
-    public String getName() {
-        return name;
+    public String getFullName() {
+        return fullName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 
     public String getEmail() {
@@ -82,13 +85,5 @@ public class users {
 
     public void setRole(Role role) {
         this.role = role;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
     }
 }

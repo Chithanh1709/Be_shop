@@ -1,113 +1,105 @@
--- Reset lại DB
+-- XÓA VÀ TẠO LẠI DATABASE
 DROP DATABASE IF EXISTS test;
-CREATE DATABASE IF NOT EXISTS test;
+CREATE DATABASE test;
 USE test;
 
--- ========== BẢNG MOVIES RÚT GỌN ==========
-CREATE TABLE Movies (
-    MovieID INT PRIMARY KEY, -- ID từ API ngoài
-    Title VARCHAR(255),
-    OriginalTitle VARCHAR(255),
-    ReleaseDate DATE
+-- ========== BẢNG PHIM ==========
+CREATE TABLE movies (
+    movie_id BIGINT PRIMARY KEY, -- ID từ API ngoài
+    title VARCHAR(255),
+    original_title VARCHAR(255),
+    release_date DATE
 );
 
 -- Rạp chiếu
-CREATE TABLE Theaters (
-    TheaterID INT PRIMARY KEY AUTO_INCREMENT,
-    Name VARCHAR(255) NOT NULL,
-    Location VARCHAR(255) NOT NULL
+CREATE TABLE theaters (
+    theater_id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(255) NOT NULL,
+    location VARCHAR(255) NOT NULL
 );
 
 -- Phòng chiếu
-CREATE TABLE Rooms (
-    RoomID INT PRIMARY KEY AUTO_INCREMENT,
-    TheaterID INT,
-    RoomName VARCHAR(100),
-    TotalSeats INT,
-    FOREIGN KEY (TheaterID) REFERENCES Theaters(TheaterID)
+CREATE TABLE rooms (
+    room_id INT PRIMARY KEY AUTO_INCREMENT,
+    theater_id INT,
+    room_name VARCHAR(100),
+    total_seats INT,
+    FOREIGN KEY (theater_id) REFERENCES theaters(theater_id) ON DELETE CASCADE
 );
 
 -- Suất chiếu
-CREATE TABLE Showtimes (
-    ShowtimeID INT PRIMARY KEY AUTO_INCREMENT,
-    MovieID INT,
-    RoomID INT,
-    ShowTime DATETIME,
-    Price DECIMAL(10,2),
-    FOREIGN KEY (MovieID) REFERENCES Movies(MovieID),
-    FOREIGN KEY (RoomID) REFERENCES Rooms(RoomID)
+CREATE TABLE showtimes (
+    showtime_id INT PRIMARY KEY AUTO_INCREMENT,
+    movie_id BIGINT,
+    room_id INT,
+    show_time DATETIME,
+    price DECIMAL(10,2),
+    FOREIGN KEY (movie_id) REFERENCES movies(movie_id) ON DELETE CASCADE,
+    FOREIGN KEY (room_id) REFERENCES rooms(room_id) ON DELETE CASCADE
 );
 
 -- Người dùng
 CREATE TABLE Users (
-    UserID INT PRIMARY KEY AUTO_INCREMENT,
-    FullName VARCHAR(255),
-    Email VARCHAR(255) UNIQUE,
-    Phone VARCHAR(20)
+    user_id INT PRIMARY KEY AUTO_INCREMENT,
+    full_name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    role VARCHAR(50) DEFAULT 'customer'
 );
 
 -- Vé đã đặt
-CREATE TABLE Tickets (
-    TicketID INT PRIMARY KEY AUTO_INCREMENT,
-    UserID INT,
-    ShowtimeID INT,
-    SeatNumber VARCHAR(10),
-    BookingDate DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (UserID) REFERENCES Users(UserID),
-    FOREIGN KEY (ShowtimeID) REFERENCES Showtimes(ShowtimeID)
+CREATE TABLE tickets (
+    ticket_id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT,
+    showtime_id INT,
+    seat_number VARCHAR(10),
+    booking_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (showtime_id) REFERENCES showtimes(showtime_id) ON DELETE CASCADE
 );
 
 -- Ghế cố định
-CREATE TABLE Seats (
-    SeatID INT PRIMARY KEY AUTO_INCREMENT,
-    RoomID INT,
-    SeatNumber VARCHAR(10),
-    FOREIGN KEY (RoomID) REFERENCES Rooms(RoomID)
+CREATE TABLE seats (
+    seat_id INT PRIMARY KEY AUTO_INCREMENT,
+    room_id INT,
+    seat_number VARCHAR(10),
+    FOREIGN KEY (room_id) REFERENCES rooms(room_id) ON DELETE CASCADE
 );
 
 -- ========== DỮ LIỆU MẪU ==========
 
--- Phim (rút gọn)
-INSERT INTO Movies (MovieID, Title, OriginalTitle, ReleaseDate)
-VALUES
-(552524, 'Lilo & Stitch', 'Lilo & Stitch', '2025-05-17');
+-- USERS
+INSERT INTO Users (full_name, email, password, role) VALUES
+('Nguyen Van A', 'a@gmail.com', '123456', 'customer'),
+('Tran Thi B', 'b@gmail.com', '654321', 'admin');
 
--- Rạp chiếu
-INSERT INTO Theaters (Name, Location)
-VALUES 
-('CGV Times City', 'Hà Nội'),         -- ID 1
-('Lotte Cinema Landmark', 'TP.HCM');  -- ID 2
+-- MOVIES
+INSERT INTO movies (movie_id, title, original_title, release_date) VALUES
+(1001, 'Avengers: Endgame', 'Avengers: Endgame', '2019-04-26'),
+(1002, 'Inception', 'Inception', '2010-07-16');
 
--- Phòng chiếu
-INSERT INTO Rooms (TheaterID, RoomName, TotalSeats)
-VALUES
-(1, 'Room A', 100),  -- ID 1
-(1, 'Room B', 80),   -- ID 2
-(2, 'Room C', 120);  -- ID 3
+-- THEATERS
+INSERT INTO theaters (name, location) VALUES
+('CGV Vincom', 'Hà Nội'),
+('Galaxy Nguyễn Du', 'TP. Hồ Chí Minh');
 
--- Suất chiếu
-INSERT INTO Showtimes (MovieID, RoomID, ShowTime, Price)
-VALUES
-(552524, 1, '2025-06-04 19:00:00', 90000),
-(552524, 2, '2025-06-04 21:30:00', 95000),
-(552524, 3, '2025-06-04 18:00:00', 85000);
+-- ROOMS
+INSERT INTO rooms (theater_id, room_name, total_seats) VALUES
+(1, 'Phòng 1', 100),
+(1, 'Phòng 2', 80),
+(2, 'Phòng 3', 120);
 
--- Người dùng
-INSERT INTO Users (FullName, Email, Phone)
-VALUES
-('Nguyễn Chí Thành', 'nchithanh170904@gmail.com', '09712823000'),
-('Nguyễn Đức Trí', 'nguyentri1o2.z@gmail.com', '0932123456');
+-- SHOWTIMES
+INSERT INTO showtimes (movie_id, room_id, show_time, price) VALUES
+(1001, 1, '2025-06-07 18:00:00', 75000),
+(1002, 2, '2025-06-07 20:30:00', 90000);
 
--- Vé đã đặt
-INSERT INTO Tickets (UserID, ShowtimeID, SeatNumber)
-VALUES
-(1, 1, 'A1'),
-(2, 1, 'A2'),
-(1, 3, 'C5');
-
--- Ghế cố định
-INSERT INTO Seats (RoomID, SeatNumber)
-VALUES
+-- SEATS (10 ghế cho phòng 1)
+INSERT INTO seats (room_id, seat_number) VALUES
 (1, 'A1'), (1, 'A2'), (1, 'A3'), (1, 'A4'), (1, 'A5'),
-(2, 'B1'), (2, 'B2'), (2, 'B3'),
-(3, 'C1'), (3, 'C2'), (3, 'C3'), (3, 'C4'), (3, 'C5');
+(1, 'B1'), (1, 'B2'), (1, 'B3'), (1, 'B4'), (1, 'B5');
+
+-- TICKETS (user 1 đặt 2 vé)
+INSERT INTO tickets (user_id, showtime_id, seat_number) VALUES
+(1, 1, 'A1'),
+(1, 1, 'A2');
