@@ -8,6 +8,9 @@ import com.example.demo.Model.movies;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
+import java.util.Map;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 
 
 @RestController
@@ -35,12 +38,20 @@ public String syncMovies(@RequestParam(defaultValue = "1") int page) {
 }
 
 
-@GetMapping("/movies/sorted")
-public List<movies> getAllMoviesSorted() {
-    return moviesRepo.findAllByOrderByReleaseDateDesc();
-}
-}
+// @GetMapping("/movies/sorted")
+// public List<movies> getAllMoviesSorted() {
+//     return moviesRepo.findAllByOrderByReleaseDateDesc();
+// }
 
-    
+@GetMapping("/movies/live")
+public ResponseEntity<List<Map<String, Object>>> getLiveMovies() {
+    try {
+        List<Map<String, Object>> movies = moviesService.fetchLiveMoviesWithPoster(1);
+        return ResponseEntity.ok(movies);
+    } catch (Exception e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+    }
+}
+}
     
 

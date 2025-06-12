@@ -9,6 +9,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class moviesService {
@@ -56,4 +60,25 @@ public class moviesService {
             movieRepository.save(movie);
         }
     }
+
+    public List<Map<String, Object>> fetchLiveMoviesWithPoster(int page) throws Exception {
+    String url = buildUrl(page);
+    String json = restTemplate.getForObject(url, String.class);
+    JsonNode root = objectMapper.readTree(json);
+    JsonNode results = root.path("results");
+
+    List<Map<String, Object>> movieList = new ArrayList<>();
+    for (JsonNode movieNode : results) {
+        Map<String, Object> movie = new HashMap<>();
+        movie.put("movieId", movieNode.path("id").asLong());
+        movie.put("title", movieNode.path("title").asText());
+        movie.put("originalTitle", movieNode.path("original_title").asText());
+        movie.put("releaseDate", movieNode.path("release_date").asText());
+        movie.put("posterPath", movieNode.path("poster_path").asText());
+        movieList.add(movie);
+    }
+
+    return movieList;
+}
+
 }
