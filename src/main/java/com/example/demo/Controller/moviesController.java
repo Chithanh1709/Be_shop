@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
 
-
 @RestController
 public class moviesController {
 
@@ -24,23 +23,18 @@ public class moviesController {
     }
 
     @GetMapping("/movies")
-public String syncMovies(@RequestParam(defaultValue = "1") int page) {
-    try {
-        moviesService.fetchAndSaveMovies(page);
-        return "Đã đồng bộ phim thành công (trang " + page + ")!";
-    } catch (Exception e) {
-        e.printStackTrace();
-        return "Đã xảy ra lỗi khi đồng bộ phim: " + e.getMessage();
+    public String syncMovies(@RequestParam(defaultValue = "1") int page) {
+        try {
+            moviesService.fetchAndSaveMovies(page);
+            return "Đã đồng bộ phim thành công (trang " + page + ")!";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Đã xảy ra lỗi khi đồng bộ phim: " + e.getMessage();
+        }
+    }
+
+    @GetMapping("/movies/sorted")
+    public List<movies> getAllMoviesSorted() {
+        return moviesRepo.findAllByOrderByReleaseDateDesc();
     }
 }
-
-
-@GetMapping("/movies/sorted")
-public List<movies> getAllMoviesSorted() {
-    return moviesRepo.findAllByOrderByReleaseDateDesc();
-}
-}
-
-    
-    
-

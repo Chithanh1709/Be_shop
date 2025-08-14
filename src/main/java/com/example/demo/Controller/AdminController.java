@@ -19,7 +19,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 public class AdminController {
     @Autowired
     private userRepo userRepo;
-
+    private moviesController moviesController;
+;
     @PostMapping("/login-admin")
     public ResponseEntity<?> loginAdmin(@RequestBody Users userEntity) {
         Optional<Users> userOptional = userRepo.findByEmail(userEntity.getEmail());
@@ -52,6 +53,12 @@ public class AdminController {
         return ResponseEntity.ok(response);
     }
 
-    
+    // public void setMoviesController(moviesController moviesController) {
+    //     this.moviesController = moviesController;
+    // }
+
+    // public moviesController getMoviesController() {
+    //     return moviesController;
+    // }
 
 }

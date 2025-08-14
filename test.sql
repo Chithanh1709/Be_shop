@@ -19,13 +19,7 @@ CREATE TABLE theaters (
 );
 
 -- Phòng chiếu
-CREATE TABLE rooms (
-    room_id INT PRIMARY KEY AUTO_INCREMENT,
-    theater_id INT,
-    room_name VARCHAR(100),
-    total_seats INT,
-    FOREIGN KEY (theater_id) REFERENCES theaters(theater_id) ON DELETE CASCADE
-);
+
 
 -- Suất chiếu
 CREATE TABLE showtimes (
@@ -80,14 +74,18 @@ INSERT INTO movies (movie_id, title, original_title, release_date) VALUES
 
 -- THEATERS
 INSERT INTO theaters (name, location) VALUES
-('CGV Vincom', 'Hà Nội'),
+('Beta Giai Phong', 'Hà Nội'),
 ('Galaxy Nguyễn Du', 'TP. Hồ Chí Minh');
 
 -- ROOMS
 INSERT INTO rooms (theater_id, room_name, total_seats) VALUES
-(1, 'Phòng 1', 100),
+(1, 'Phòng 1', 80),
 (1, 'Phòng 2', 80),
-(2, 'Phòng 3', 120);
+(1, 'Phòng 3', 80),
+(1, 'Phòng 4', 80),
+(1, 'Phòng 5', 80),
+(1, 'Phòng 6', 80);
+
 
 -- SHOWTIMES
 INSERT INTO showtimes (movie_id, room_id, show_time, price) VALUES
